@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2020-06-06 09:58:11
- * @LastEditTime: 2020-07-08 19:35:54
+ * @LastEditTime: 2020-07-08 20:03:56
  * @LastEditors: sueRimn
  * @Description: In User Settings Edit
  * @FilePath: /world-love/src/views/home/layout/menu.vue
@@ -43,7 +43,7 @@ export default {
       activeIndex: this.$store.state.menuActive,
     };
   },
-  watch: {
+  watch: { 
     menuInfo: {
       handler: function(newVal) {
         // if(this.flag) return
