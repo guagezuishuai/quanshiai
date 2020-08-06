@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2020-06-06 09:57:56
- * @LastEditTime: 2020-07-07 21:59:09
+ * @LastEditTime: 2020-07-20 22:39:51
  * @LastEditors: sueRimn
  * @Description: In User Settings Edit
  * @FilePath: /world-love/src/views/home/layout/header.vue
@@ -68,14 +68,16 @@ export default {
   },
   mounted() {
     const headerActiveIndex = localStorage.getItem('headerActiveIndex');
-    this.tabChange(headerActiveIndex || 0)
+    this.tabChange(headerActiveIndex || 1)
   },
   methods: {
     // 头部tab切换并把子集的菜单传输出去
     tabChange(index) {
+      this.$store.commit("menuActiveChange", String(1));
       this.activeName = this.tabInfo[index].name;
       localStorage.setItem('headerActiveIndex', index);
       this.$emit('headerMenuChange', this.tabInfo[index].children);
+      localStorage.setItem("menuActive", 1);
     }
   }
 }

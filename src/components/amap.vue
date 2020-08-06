@@ -1,6 +1,7 @@
 <template>
   <div class="map">
      <el-slider
+     v-if="slider"
       v-model="circleValue"
       :max="5000"
       @change="circleValueChange"
@@ -12,6 +13,12 @@
 
 <script>
 export default {
+  props: {
+    slider: {
+      type: Boolean,
+      default: false
+    }
+  },
   data() {
     return {
       map: {},

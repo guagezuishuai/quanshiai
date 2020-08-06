@@ -1,4 +1,88 @@
 $main-color: linear-gradient(to right, #2BB2E7 , #35D1CF);
+// 表格顶部的搜索框的公共样式
+.topbox{
+  background-color: #fff;
+  padding: 10px 20px;
+  margin-bottom: 20PX;
+}
+.topboxBtn{
+  display: inline-block;
+}
+/deep/.is-in-pagination{
+  width: 50px!important;
+}
+
+// 表格的统一样式
+.tableBtns{
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  align-items: center;
+  margin-bottom: 10px;
+}
+.btnSee:hover{
+  background-color: #2BB2E7;
+  color: #fff;
+}
+.btnEdit:hover{
+  background-color: #35D1CF;
+  color: #fff;
+}
+.btndel:hover{
+  background-color: #F16D4F;
+  color: #fff;
+}
+.btnSee:hover{
+  background-color: #2BB2E7;
+  color: #fff;
+}
+
+// tableGroup的公共样式
+.rowContent{
+  display: flex;
+  flex-wrap: wrap;
+  margin-left: 20px;
+  .item{
+    display: flex;
+    align-items: center;
+    margin: 10px 15px 10px 0;
+    .label{
+      width: 100px;
+    }
+  }
+  .checkBoxItem{
+    display: flex;
+    width: 100%;
+    .left, .right{
+      display: flex;
+      justify-content: space-between;
+      width: 50%;
+      padding-right: 20px;
+      .checkbox-group{
+        width: 100%;
+      }
+      .checkBox{
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+      }
+    }
+  }
+}
+
+// 表单底部按钮样式
+.btmBtn{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  .btn{
+    width: 300px;
+    height: 40px;
+    font-size: 18px;
+  }
+}
+
 
 .mainbgcolor{
   background-image: $main-color;
@@ -21,7 +105,7 @@ $main-color: linear-gradient(to right, #2BB2E7 , #35D1CF);
 
 /*滚动条样式*/
 .srollBar::-webkit-scrollbar {
-  width: 6px;    
+  width: 4px;    
   /*height: 4px;*/
 }
 .srollBar::-webkit-scrollbar-thumb {

@@ -1,6 +1,6 @@
 <template>
   <div class="list">
-    <div class="filterBox">
+    <div class="topbox">
       <div class="btnBox">
         <el-button class="mainbgcolor" size="small" type="primary" @click="$router.push('/customer/add')" icon="el-icon-edit">新增客户</el-button>
         <el-button class="mainbgcolor" size="small" type="primary" icon="el-icon-edit">查询</el-button>
@@ -116,15 +116,13 @@
 </template>
 
 <script>
-import mechanismTable from '@/components/mechanismTable.vue'
+import customTablemixins from '@/minxins/customTable';
 export default {
+  mixins: [customTablemixins],
   data() {
     return {
       formType: 'search',
       searchBoxState: 'up',
-      page: 1,
-      pageSize: 8,
-      count: 100,
       dataInfo: {
         inline: true, // 表单组件的排列方式
         labelPosition: 'left', // top  left 表单label的位置
@@ -457,23 +455,12 @@ export default {
     },
     frozen() {
 
-    },
-    handleSizeChange() {
-
-    },
-    handleCurrentChange() {
-
     }
   }
 }
 </script>
 
 <style lang="scss" scoped>
-.filterBox{
-  background-color: #fff;
-  padding: 10px 20px;
-  margin-bottom: 20PX;
-}
 .table{
   .baseInfoBox{
     display: flex;
@@ -484,6 +471,9 @@ export default {
       margin-right: 5px;
     }
   }
+}
+/deep/.el-input{
+  width: 175px;
 }
 .pagination{
   text-align: center;

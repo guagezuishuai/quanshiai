@@ -59,7 +59,9 @@ export default {
   props: {
     groupInfo: {
       type: Object,
-      default: {}
+      default: () => {
+        return {}
+      }
     }
   }
 };
@@ -68,6 +70,7 @@ export default {
 <style lang="scss" scoped>
 .tableGroup {
   margin-bottom: 20px;
+  background-color: #fff;
   .groupTitle {
     background-color: #caedfd;
     padding: 5px 10px;
@@ -92,13 +95,15 @@ export default {
   }
   .rightContentBox {
     flex: 1;
+    display: flex;
+    flex-wrap: wrap;
   }
   .rightContent {
     display: flex;
-    flex: 1;
+    width: 100%;
     margin-bottom: 20px;
     .rowTitle {
-      width: 185px !important;
+      width: 140px !important;
     }
     .rowBox {
       flex-wrap: wrap;
@@ -111,7 +116,7 @@ export default {
     display: flex;
     margin-bottom: 20px;
     .rowTitle {
-      width: 247px;
+      width: 200px;
       background-color: #eff3f3;
       border-radius: 6px;
       color: #273359;

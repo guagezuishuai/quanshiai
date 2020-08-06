@@ -113,6 +113,7 @@ export default [
         name: '设备管理',
         path: '/sysControl/device'
       },
+      
       {
         index: 3,
         name: '我的账号',
@@ -142,7 +143,43 @@ export default [
         index: 8,
         name: '数据字典',
         path: '/sysControl/dataDictionaries'
-      }
+      },
+      {
+        index: '2-1',
+        name: '新增设备',
+        path: '/sysControl/addDevice',
+        isShow: false
+      },
+      {
+        index: '2-2',
+        name: '绑定设备',
+        path: '/sysControl/bindingDevice',
+        isShow: false
+      },
+      {
+        index: '2-3',
+        name: '安全设置',
+        path: '/sysControl/safeEdit',
+        isShow: false
+      },
+      {
+        index: '2-4',
+        name: '新增员工',
+        path: '/sysControl/staffAdd',
+        isShow: false
+      },
+      {
+        index: '2-5',
+        name: '新增员工',
+        path: '/sysControl/mechanismAdd',
+        isShow: false
+      },
+      {
+        index: '2-5',
+        name: '新增员工',
+        path: '/sysControl/roleAdd',
+        isShow: false
+      },
     ]
   }
 ]
