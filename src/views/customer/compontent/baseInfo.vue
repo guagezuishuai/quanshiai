@@ -7,18 +7,18 @@
           <!-- 客户编号 -->
           <div class="rowContent" slot="编号归属">
             <el-form-item label="客户编号" class="item">
-              <el-input size="small" v-model="userInfo.userNumber"></el-input>
+              <el-input size="small" disabled v-model="userInfo.userNumber"></el-input>
             </el-form-item>
             <el-form-item label="所属机构" class="item">
               <div @click="showTable">
-                <el-input size="small" disabled  v-model="userInfo.org"></el-input>
+                <el-input size="small" readonly  v-model="userInfo.org"></el-input>
               </div>
             </el-form-item>
           </div>
           <!-- 登记时间 -->
           <div class="rowContent" slot="登记时间">
             <el-form-item label="登记时间" class="item">
-              <el-input size="small" v-model="userInfo.resTime"></el-input>
+              <el-input size="small" disabled v-model="userInfo.resTime"></el-input>
             </el-form-item>
           </div>
           <!-- 其他信息 -->
@@ -127,13 +127,13 @@
           <!-- 联系电话 -->
           <div class="rowContent" slot="联系电话">
             <el-form-item label="客户电话1" prop="tel1" class="item">
-              <el-input size="small" v-model="userInfo.userNumber"></el-input>
+              <el-input size="small" v-model="userInfo.customerPhpone"></el-input>
             </el-form-item>
             <el-form-item label="客户电话2" class="item">
-              <el-input size="small" v-model="userInfo.org"></el-input>
+              <el-input size="small" v-model="userInfo.customerPhpone2"></el-input>
             </el-form-item>
             <el-form-item label="客户电话3" class="item">
-              <el-input size="small" v-model="userInfo.org"></el-input>
+              <el-input size="small" v-model="userInfo.customerPhpone3"></el-input>
             </el-form-item>
           </div>
           <!-- 联系地址 -->

@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2020-06-06 09:58:11
- * @LastEditTime: 2020-07-20 22:40:31
+ * @LastEditTime: 2020-10-12 17:45:44
  * @LastEditors: sueRimn
  * @Description: In User Settings Edit
  * @FilePath: /world-love/src/views/home/layout/menu.vue
@@ -13,6 +13,8 @@
       text-color="#5E97CF"
       active-text-color="#fff"
       background-color="#222336"
+      ref="menu"
+      @select="menuSelect"
     >
       <template v-for="(key , index) in menuInfo">
         <el-submenu
@@ -57,32 +59,17 @@ export default {
   },
   data() {
     return {
-      activeIndex: this.$store.state.menuActive
+      activeIndex: '1'
     };
-  },
-  watch: {
-    menuInfo: {
-      handler: function(newVal) {
-        if (newVal.length > 0) {
-          const menuActive = localStorage.getItem("menuActive");
-          const path = localStorage.getItem("curHref");
-          console.log(menuActive);
-          this.init(menuActive || 0, newVal[menuActive - 1].path || path);
-        }
-      },
-      deep: true
-    },
-    "$store.state.menuActive"(newVal) {
-      this.activeIndex = newVal;
-      localStorage.setItem("menuActive", newVal);
-    }
   },
   methods: {
     init(index, path) {
-      console
       this.$store.commit("menuActiveChange", String(index));
       this.$router.push(path);
       localStorage.setItem("curHref", path);
+    },
+    menuSelect(index, indexPath) {
+      localStorage.setItem('menuActiveIndex', index)
     }
   }
 };

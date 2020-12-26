@@ -27,14 +27,22 @@
       <el-table-column width="250px" slot="operation" label="操作">
         <template slot-scope="scope">
           <div class="tableBtns">
-              <el-button class="btn_link btnSee"  @click="see(scope)">查看</el-button>
-              <el-button class="btn_link btnEdit"  @click="edit(scope)">修改</el-button>
-              <el-button class="btn_link btndel"  @click="del(scope)">删除</el-button>
-            </div>
-            <div class="tableBtns">
-              <el-button class="btn_link btnSee" @click="activation(scope)">激活</el-button>
-              <el-button class="btn_link btndel" @click="thaw(scope)">冻结</el-button>
-            </div>
+            <el-button class="btn_link btnSee" @click="see(scope)">查看</el-button>
+            <el-button class="btn_link btnEdit" @click="edit(scope)">修改</el-button>
+            <el-button class="btn_link btndel" @click="del(scope)">删除</el-button>
+          </div>
+          <div class="tableBtns">
+            <el-button
+              class="btn_link btnSee"
+              :disabled="scope.row.status == '0'"
+              @click="activation(scope)"
+            >激活</el-button>
+            <el-button
+              class="btn_link btndel"
+              :disabled="scope.row.status == '1'"
+              @click="thaw(scope)"
+            >冻结</el-button>
+          </div>
         </template>
       </el-table-column>
     </cusTomTable>
@@ -43,6 +51,7 @@
 
 <script>
 import customTablemixins from "@/minxins/customTable";
+import { listPage, orgModifyStatus, orgDelete } from "@/api/sys";
 export default {
   name: "mechanism",
   mixins: [customTablemixins],
@@ -55,7 +64,7 @@ export default {
         components: [
           {
             type: "input",
-            props: "userNumber",
+            props: "code",
             placeholder: "请输入机构编号",
             label: "机构编号",
             size: "small",
@@ -66,7 +75,7 @@ export default {
           },
           {
             type: "input",
-            props: "userNumber",
+            props: "acountName",
             placeholder: "请输入登录账号",
             label: "登录账号",
             size: "small",
@@ -77,7 +86,7 @@ export default {
           },
           {
             type: "input",
-            props: "userNumber",
+            props: "name",
             placeholder: "请输入机构名称",
             label: "机构名称",
             size: "small",
@@ -88,7 +97,7 @@ export default {
           },
           {
             type: "select",
-            props: "userSex",
+            props: "type",
             placeholder: "请选择机构类型",
             label: "机构类型",
             size: "small",
@@ -110,7 +119,7 @@ export default {
           },
           {
             type: "select",
-            props: "userSex",
+            props: "level",
             placeholder: "请选择机构等级",
             label: "机构等级",
             size: "small",
@@ -132,7 +141,7 @@ export default {
           },
           {
             type: "select",
-            props: "userSex",
+            props: "address",
             placeholder: "请选择所属区域",
             label: "所属区域",
             size: "small",
@@ -154,7 +163,7 @@ export default {
           },
           {
             type: "input",
-            props: "userNumber",
+            props: "pidName",
             placeholder: "请输入上级机构",
             label: "上级机构",
             size: "small",
@@ -165,7 +174,7 @@ export default {
           },
           {
             type: "input",
-            props: "userNumber",
+            props: "contacts",
             placeholder: "请输入联系人",
             label: "联系人",
             size: "small",
@@ -176,7 +185,7 @@ export default {
           },
           {
             type: "input",
-            props: "userNumber",
+            props: "contactNumber",
             placeholder: "请输入联系人电话",
             label: "联系人电话",
             size: "small",
@@ -187,57 +196,111 @@ export default {
           }
         ]
       },
-      tableData: [
-        {
-          orgName: "1"
-        }
-      ],
+      tableData: [],
       tableInfo: [
         {
           label: "机构编号",
-          prop: "orgName"
+          prop: "code"
         },
         {
           label: "登录账号",
-          prop: "orgName"
+          prop: "acountName"
         },
         {
           label: "机构名称",
-          prop: "orgName"
+          prop: "name"
         },
         {
           label: "机构类型",
-          prop: "orgName"
+          prop: "type"
         },
         {
           label: "机构等级",
-          prop: "orgName"
+          prop: "level"
         },
         {
           label: "所属区域",
-          prop: "orgName"
+          prop: "address"
         },
         {
           label: "上级机构",
-          prop: "orgName"
+          prop: "pidName"
         },
         {
           label: "机构概况",
-          prop: "orgName"
+          prop: "orgainProfile"
         },
         {
           label: "联系人",
-          prop: "orgName"
+          prop: "contacts"
         },
         {
           label: "联系人电话",
-          prop: "orgName"
+          prop: "contactNumber"
         }
       ]
     };
   },
+  mounted() {
+    this.init();
+  },
   methods: {
-    
+    init() {
+      this.$refs.form.getFromValue(params => {
+        params["page"] = {
+          size: this.pageSize,
+          current: this.page
+        };
+        listPage(params).then(res => {
+          this.tableData = res.data.records;
+        });
+      });
+    },
+    see(info) {
+      console.log(info);
+      this.$router.push({
+        path: "/sysControl/mechanismAdd",
+        query: {
+          id: info.row.id,
+          isEdit: false
+        }
+      });
+    },
+    edit(info) {
+      this.$router.push({
+        path: "/sysControl/mechanismAdd",
+        query: {
+          id: info.row.id,
+          isEdit: true
+        }
+      });
+    },
+    del(info) {
+      this.$confirm("确认删除？", "提示", {
+        confirmButtonText: "确认",
+        cancelButtonText: "取消",
+        type: "info",
+        center: true
+      }).then(res => {
+        orgDelete({ id: info.row.id }).then(val => {
+          this.$message.success("删除成功");
+          this.page = 1;
+          this.init();
+        });
+      });
+    },
+    activation(info) {
+      orgModifyStatus({ id: info.row.id, status: "0" }).then(res => {
+        this.$message.success("激活成功");
+        this.init();
+      });
+    },
+    thaw(info) {
+      orgModifyStatus({ id: info.row.id, status: "1" }).then(res => {
+        this.$message.success("冻结成功");
+        this.init();
+      });
+    }
   }
 };
 </script>

@@ -5,17 +5,27 @@
       <div class>
         <template v-for="(key, index) in auter">
           <div class="autherItemBox" :key="`auther${index}`">
-            <div class="left">
-              <el-checkbox v-model="key.checked">{{ key.name }}</el-checkbox>
+            <div class="left" @contextmenu="rightCilck(...arguments,key, 1)">
+               <el-checkbox v-if="hasCheck" v-model="key.checked">{{ key.name }}</el-checkbox>
+              <span v-else>{{ key.name }}</span>
             </div>
             <div class="right">
               <template v-for="(item, itemIndex) in key.child">
                 <div class="autherItem" :key="`item${itemIndex}`">
                   <template v-for="(autherItem, autherIndex) in item">
-                    <el-checkbox
+                    <div
+                      v-if="autherIndex === 0"
+                      @contextmenu="rightCilck(...arguments,autherItem, 2)"
                       :key="`auther${autherIndex}`"
-                      v-model="autherItem.checked"
-                    >{{ autherItem.name }}</el-checkbox>
+                      class="item"
+                    >
+                      <el-checkbox v-if="hasCheck" v-model="autherItem.checked">{{ autherItem.name }}</el-checkbox>
+                      <span v-else>{{ autherItem.name }}</span>
+                    </div>
+                    <div v-else class="item" @contextmenu="rightCilck(...arguments,autherItem, 3)" :key="`auther${autherIndex}`">
+                      <el-checkbox v-if="hasCheck" v-model="autherItem.checked">{{ autherItem.name }}</el-checkbox>
+                      <span v-else>{{ autherItem.name }}</span>
+                    </div>
                   </template>
                 </div>
               </template>
@@ -28,8 +38,19 @@
 </template>
 
 <script>
+import {menuList} from '@/api/sys';
 export default {
   name: "auther",
+  props: {
+    hasCheck: {
+      type: Boolean,
+      default: false
+    },
+    autherIdArr: {
+      type: Array,
+      default: () => []
+    }
+  },
   data() {
     return {
       auter: [
@@ -406,28 +427,62 @@ export default {
     };
   },
   mounted() {
-    this.$nextTick(() => {
-      let content = document.querySelector('.content')
-      content.oncontextmenu=function(ev){
-          var ev=ev || event;
-          console.log(ev)
-          return false;
-      }
-    })
+    this.init();
+  },
+  methods: {
+    init() {
+      menuList().then(res => {
+        this.auter = res.data.map(item => {
+          item.child = item.child.map(val => {
+            return [val, ...val.child]
+          })
+          return item;
+        })
+      });
+    },
+    rightCilck(e, info, autherKey) {
+      const ev = e || event;
+      console.log(info)
+      this.$emit('rightCilck', ev, info, autherKey)
+      return false;
+    },
+    getCheckList() {
+      let ans = [];
+      this.auter.forEach(val => {
+        if(val.checked) ans.push({menuId: val.id, roleId: ''})
+        val.child.forEach(itemBox => {
+          itemBox.forEach(item => {
+            if(item.checked) ans.push({menuId: item.id, roleId: ''})
+          })
+        })
+      })
+      return ans
+    },
+    echoCheckList() {
+      this.auter.forEach(val => {
+        if(val.checked) ans.push({menuId: val.id, roleId: ''})
+        val.child.forEach(itemBox => {
+          itemBox.forEach(item => {
+            if(item.checked) ans.push({menuId: item.id, roleId: ''})
+          })
+        })
+      })
+    }
   }
 };
 </script>
 
 <style lang="scss" scoped>
-.title{
+.title {
   font-size: 16px;
   padding: 5px 0 5px 15px;
-  background-color: #CAEDFD;
+  background-color: #caedfd;
 }
 .auther {
   .content {
     background-color: #fff;
     padding: 20px 40px;
+    min-height: calc(100vh - 220px);
     .autherItemBox {
       display: flex;
       justify-content: left;
@@ -451,6 +506,12 @@ export default {
       .autherItem {
         display: flex;
         line-height: 40px;
+        .item{
+          padding: 0 20px;
+          &:hover{
+            cursor: pointer;
+          }
+        }
       }
     }
   }

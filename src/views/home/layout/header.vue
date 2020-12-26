@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2020-06-06 09:57:56
- * @LastEditTime: 2020-07-20 22:39:51
+ * @LastEditTime: 2020-10-12 17:15:12
  * @LastEditors: sueRimn
  * @Description: In User Settings Edit
  * @FilePath: /world-love/src/views/home/layout/header.vue
@@ -22,7 +22,7 @@
           <i class="el-icon-user"></i>
           <span class="userName">{{ userName }}</span>
         </div>
-        <div class="output">
+        <div class="output" @click="loginOut">
           <i class="el-icon-setting"></i>
           <span>退出</span>
         </div>
@@ -54,7 +54,7 @@
 <script>
 import logo from '@/assets/imgs/login/LOGO@2x.png';
 import logoAndName from '@/assets/imgs/login/logo&name.png';
-import tabInfo from '@/util/headerTabInfo.js'
+import tabInfo from '@/util/headerTabInfo.js';
 export default {
   data() {
     return {
@@ -67,17 +67,21 @@ export default {
     }
   },
   mounted() {
-    const headerActiveIndex = localStorage.getItem('headerActiveIndex');
-    this.tabChange(headerActiveIndex || 1)
+    const userInfo = JSON.parse(localStorage.getItem('userInfo'));
+    this.userName = userInfo.employee.name
+    // this.tabChange(headerActiveIndex || 1)
   },
   methods: {
     // 头部tab切换并把子集的菜单传输出去
     tabChange(index) {
-      this.$store.commit("menuActiveChange", String(1));
+      // this.$store.commit("menuActiveChange", String(1));
       this.activeName = this.tabInfo[index].name;
       localStorage.setItem('headerActiveIndex', index);
       this.$emit('headerMenuChange', this.tabInfo[index].children);
-      localStorage.setItem("menuActive", 1);
+    },
+    loginOut() {
+      localStorage.clear();
+      this.$router.push('/login')
     }
   }
 }
@@ -97,6 +101,9 @@ export default {
       margin-left: 400px;
       .user , .output{
         flex: 1;
+      }
+      .output:hover{
+        cursor: pointer;
       }
     }
   }

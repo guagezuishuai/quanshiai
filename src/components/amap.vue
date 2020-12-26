@@ -14,9 +14,23 @@
 <script>
 export default {
   props: {
+    // 围栏范围的大小是否展示
     slider: {
       type: Boolean,
       default: false
+    },
+    // 当前地图覆盖物的相关信息
+    mapInfo: {
+      type: Object,
+      default: () => {
+        return {
+          
+        }
+      }
+    },
+    // 当前需要展示的经纬定
+    curLocal: {
+      type: String,
     }
   },
   data() {
@@ -24,7 +38,8 @@ export default {
       map: {},
       circleValue: 1000,
       marker: {},
-      circle: {}
+      circle: {},
+      circleList: [1,2,3]
     };
   },
   mounted() {
@@ -53,22 +68,25 @@ export default {
         window.AMap.event.addListener(geolocation, 'error', onError)
 
         function onComplete (data) {
-          // data是具体的定位信息
+          // data是具体的定位信息【赋值中心区域的经纬度】
           that.map = new window.AMap.Map("container",{
             zoom:13,//级别
             center: [data.position.lng , data.position.lat]
           });
-          that.mapAddSome(data.position.lng , data.position.lat);
-          that.map.on('click', function(ev) {
-            that.map.setZoomAndCenter(13, [ev.lnglat.lng, ev.lnglat.lat]);
-            that.map.clearMap();
-            that.mapAddSome(ev.lnglat.lng , ev.lnglat.lat);
-          });
+          // 添加固定的围栏的覆盖物
+          for (let i = 0; i < that.circleList.length; i++) {
+            that.mapAddSome(data.position.lng , data.position.lat);
+          }
+          // that.map.on('click', function(ev) {
+          //   that.map.setZoomAndCenter(13, [ev.lnglat.lng, ev.lnglat.lat]);
+          //   that.map.clearMap();
+          //   that.mapAddSome(ev.lnglat.lng , ev.lnglat.lat);
+          // });
         }
         function onError (data) {
           // 定位出错
           console.log('定位出错',data)
-          
+          that.$message.warning('定位出错，请联系管理员')
         }
       })
     },

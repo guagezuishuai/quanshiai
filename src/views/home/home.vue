@@ -2,12 +2,12 @@
   <el-container class="home">
     <el-header height="100px" style=";padding:0;">
       <!-- 头部组件 -->
-      <pageHeader @headerMenuChange="headerMenuChange"></pageHeader>
+      <pageHeader ref="pageHeader" @headerMenuChange="headerMenuChange"></pageHeader>
     </el-header>
     <!-- 内容部分 -->
     <el-container class="content">
       <!-- 左侧菜单 -->
-      <leftMenu :menuInfo="menuInfo"></leftMenu>
+      <leftMenu ref="leftMenu" :menuInfo="menuInfo"></leftMenu>
       <!-- 右侧内容 -->
       <section class="contentView">
         <router-view />
@@ -18,26 +18,40 @@
 
 <script>
 import pageHeader from './layout/header';
-import leftMenu from './layout/menu'
+import leftMenu from './layout/menu';
+import tabInfo from '@/util/headerTabInfo.js';
 export default {
   components: {
     pageHeader,
     leftMenu
   },
   data() {
-    const item = {
-      date: "2016-05-02",
-      name: "王小虎",
-      address: "上海市普陀区金沙江路 1518 弄"
-    };
     return {
-      tableData: Array(20).fill(item),
       menuInfo: []
     };
+  },
+  watch: {
+    '$route'(newVal) {
+      for (let i = 0; i < this.menuInfo.length; i++) {
+        if(this.menuInfo[i].path === newVal.path) {
+          this.$refs.leftMenu.$refs.menu.activeIndex = this.menuInfo[i].index+'';
+          break;
+        }
+      }
+    }
+  },
+  mounted() {
+    const headerActiveIndex = localStorage.getItem('headerActiveIndex');
+    this.$refs.pageHeader.activeName = tabInfo[headerActiveIndex].name;
+    this.menuInfo = tabInfo[headerActiveIndex].children || this.tabInfo[0].children;
+    this.$refs.leftMenu.$refs.menu.activeIndex = localStorage.getItem('menuActiveIndex') || '1';
   },
   methods: {
     headerMenuChange(leftMenuInfo) {
       this.menuInfo = leftMenuInfo;
+      // this.$refs.leftMenu.activeIndex = '1';
+      this.$refs.leftMenu.$refs.menu.activeIndex = '1';
+      this.$router.push(leftMenuInfo[0].path)
     }
   }
 };

@@ -12,8 +12,8 @@
           <el-option
             v-for="(key, index) in province_data"
             :key="`province${index}`"
-            :label="key.areaName"
-            :value="key.areaCode"
+            :label="key.pname"
+            :value="key.id"
           ></el-option>
         </el-select>
       </el-col>
@@ -28,8 +28,8 @@
           <el-option
             v-for="(key, index) in city_data"
             :key="`city${index}`"
-            :label="key.areaName"
-            :value="key.areaCode"
+            :label="key.cname"
+            :value="key.id"
           ></el-option>
         </el-select>
       </el-col>
@@ -43,8 +43,8 @@
           <el-option
             v-for="(key, index) in county_data"
             :key="`city${index}`"
-            :label="key.areaName"
-            :value="key.areaCode"
+            :label="key.dname"
+            :value="key.id"
           ></el-option>
         </el-select>
       </el-col>
@@ -108,39 +108,43 @@ export default {
     return {
       province_data: [],
       city_data: [],
-      county_data: []
+      county_data: [],
     }
   },
   watch: {
     addressInfo: {
       handler() {
-        this.init()
+        // this.init()
       },
       deep: true
     }
   },
   mounted() {
     // 有接口了吧这三个请求数据的方法换了就好了
+    console.log(this.add)
     this.init();
   },
   methods: {
-    init() {
-      this.province_data = requestProvince();
-      this.addressInfo.province !== '' && (this.city_data = requestCity(this.addressInfo.province))
-      this.addressInfo.city !== '' && (this.county_data = requestCounty(this.addressInfo.city))
+    async init() {
+      this.province_data = await requestProvince();
+      this.addressInfo.province = this.addressInfo.province ? Number(this.addressInfo.province) : '';
+      this.addressInfo.province !== '' && (this.city_data = await requestCity(this.addressInfo.province));
+      this.addressInfo.city = this.addressInfo.city ? Number(this.addressInfo.city) : '';
+      this.addressInfo.city !== '' && (this.county_data = await requestCounty(this.addressInfo.city));
+      this.addressInfo.county = this.addressInfo.county ? Number(this.addressInfo.county): '';
     },
-    proChange(value) {
+    async proChange(value) {
       this.city_data.length = 0;
       this.addressInfo.city = '';
       this.county_data.length = 0;
       this.addressInfo.county = '';
-      this.city_data = requestCity(value);
+      this.city_data = await requestCity(value);
       this.$emit('change', this.addressInfo);
     },
-    cityChange(value) {
+    async cityChange(value) {
       this.county_data.length = 0;
       this.addressInfo.county = '';
-      this.county_data = requestCounty(value);
+      this.county_data = await requestCounty(value);
       this.$emit('change', this.addressInfo);
     }
   }

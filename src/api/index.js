@@ -2,13 +2,12 @@ import axios from "axios";
 import { Message, Loading } from "element-ui";
 import { paramsHistory } from "@/util/requestTool";
 var instance = axios.create({
-  baseURL: process.env.VUE_APP_API_YUN_ROOT
+  baseURL: process.env.VUE_APP_API_ROOT
 });
 // 缓存参数的数据集合
 let paramsCatchObj = {};
 instance.defaults.headers.post["Content-Type"] =
-  "application/x-www-form-urlencoded";
-
+  "application/json;charset=UTF-8";
 // 请求返回时 允许携带cookies
 instance.defaults.withCredentials = true;
 
@@ -55,29 +54,58 @@ instance.interceptors.request.use(
   async config => {
     showFullScreenLoading();
     paramsHistory(config, paramsCatchObj);
+    config.headers['token'] = localStorage.getItem('token');
     return config;
   },
   error => {
     return Promise.reject(error);
   }
 );
+
+const errorMessage = {
+  1001: '接口认证失败',
+  1002: '登录过期',
+  1003: '缺失参数'
+}
+
+
 // 响应拦截器
 instance.interceptors.response.use(
   function(res) {
     if (res.status - 0 === 200) {
       tryHideFullScreenLoading();
-      // 登录失效后跳转到登录页面
-      if (res.data.ret == "-101") {
+      
+      if(res.data.errcode === 0) {
+        return res.data;
+      } else {
+        // 登录失效后跳转到登录页面
+        if (res.data.errcode == 1002) {
+          Message({
+            message: '登录过期',
+            type: "warning"
+          });
+          window.location.replace(location.origin+location.pathname+'#/login');
+          return false
+        }
+        const proxy = new Proxy(errorMessage, {
+          get(target,key) {
+            const value = target[key]
+            return value || res.data.errmsg
+          }
+        })
         Message({
-          message: res.data.msg,
+          message: proxy[res.data.errcode],
           type: "warning"
         });
-        return Promise.reject(res.data.msg);
+        return Promise.reject();
       }
-      return res.data;
     }
   },
   function(error) {
+    Message({
+      message: '接口请求出错了！！！',
+      type: "warning"
+    });
     // 对响应错误做点什么
     return Promise.reject(error);
   }

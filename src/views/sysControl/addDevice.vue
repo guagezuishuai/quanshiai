@@ -1,6 +1,6 @@
 <template>
   <div class="adddevice">
-    <el-form label-width="100px" :rules="rules" :model="model" inline>
+    <el-form label-width="130px" ref="form" :rules="rules" :disabled="disabled" :model="model" inline>
       <!-- 客户信息 -->
       <deviceUserInfo :groupInfo="groupInfo"></deviceUserInfo>
       <!-- 设备信息 -->
@@ -36,18 +36,24 @@
               </template>
             </el-table-column>
           </el-table>
+          <el-button @click="addEnclosure">新增围栏</el-button>
         </div>
       </div>
     </div>
+    <bottomBtn @submit="submit"></bottomBtn>
+    <!-- 电子围栏的弹窗 -->
+    <addEnclosure ref="addEnclosure" ></addEnclosure>
   </div>
 </template>
 
 <script>
 import tableGroupMixins from "@/minxins/tableGroup";
 import amap from "@/components/amap";
-import deviceUserInfo from './device/deviceUserInfo';
-import deviceInfo from './device/deviceInfo';
-import setInfo from './device/setInfo';
+import bottomBtn from "@/components/bottomBtn";
+import deviceUserInfo from "./device/deviceUserInfo";
+import deviceInfo from "./device/deviceInfo";
+import setInfo from "./device/setInfo";
+import { deviceInsert, exceptionValueList, deviceSelectById } from "@/api/sys";
 export default {
   name: "adddevice",
   mixins: [tableGroupMixins],
@@ -55,11 +61,58 @@ export default {
     amap,
     deviceUserInfo,
     deviceInfo,
-    setInfo
+    setInfo,
+    bottomBtn,
+    addEnclosure: () => import("@/components/addEnclosure")
   },
   data() {
+    const setDay = [
+      {
+        label: "周一",
+        value: "0"
+      },
+      {
+        label: "周二",
+        value: "1"
+      },
+      {
+        label: "周三",
+        value: "2"
+      },
+      {
+        label: "周四",
+        value: "3"
+      },
+      {
+        label: "周五",
+        value: "4"
+      },
+      {
+        label: "周六",
+        value: "5"
+      },
+      {
+        label: "周日",
+        value: "6"
+      }
+    ];
+    const maxValueType = [
+      {
+        lable: "默认值",
+        value: "0"
+      },
+      {
+        lable: "自定义",
+        value: "1"
+      }
+    ];
     return {
+      disabled: false,
+      setDay,
       rules: {
+        imie: [
+          { required: true, message: "请输入设备IMEI或ID号", trigger: "blur" }
+        ],
         telRedKey: [
           { required: true, message: "请输入红键号码", trigger: "blur" }
         ],
@@ -71,153 +124,31 @@ export default {
         ]
       },
       model: {
-        userName: "",
-        idNumber: "",
-        userTel: "",
+        customerId: "",
+        customerName: "",
+        customerCard: "",
+        customerPhpone: "",
         age: "",
         height: "",
         weight: "",
-        stepWidth: "",
-        IMEI: "",
-        deviceTel: "",
-        deviceType: {
-          value: [],
-          detail: "",
-          options: [
-            {
-              value: 0,
-              lable: "无"
-            },
-            {
-              value: 1,
-              lable: "高血压"
-            },
-            {
-              value: 2,
-              lable: "糖尿病"
-            },
-            {
-              value: 3,
-              lable: "冠心病"
-            }
-          ]
-        },
-        deviceModel: {
-          value: [],
-          detail: "",
-          options: [
-            {
-              value: 0,
-              lable: "无"
-            },
-            {
-              value: 1,
-              lable: "高血压"
-            },
-            {
-              value: 2,
-              lable: "糖尿病"
-            },
-            {
-              value: 3,
-              lable: "冠心病"
-            }
-          ]
-        },
-        openTime: '',
-        GPSswitch: true,
-        GPScycle: {
-          value: [],
-          detail: "",
-          options: [
-            {
-              value: 0,
-              lable: "10分钟"
-            },
-            {
-              value: 1,
-              lable: "20分钟"
-            },
-            {
-              value: 2,
-              lable: "30分钟"
-            },
-            {
-              value: 3,
-              lable: "40分钟"
-            }
-          ]
-        },
-        heartcycle: {
-          value: [],
-          detail: "",
-          options: [
-            {
-              value: 0,
-              lable: "10分钟"
-            },
-            {
-              value: 1,
-              lable: "20分钟"
-            },
-            {
-              value: 2,
-              lable: "30分钟"
-            },
-            {
-              value: 3,
-              lable: "40分钟"
-            }
-          ]
-        },
-        bloodcycle: {
-          value: [],
-          detail: "",
-          options: [
-            {
-              value: 0,
-              lable: "10分钟"
-            },
-            {
-              value: 1,
-              lable: "20分钟"
-            },
-            {
-              value: 2,
-              lable: "30分钟"
-            },
-            {
-              value: 3,
-              lable: "40分钟"
-            }
-          ]
-        },
-        temperatureCycle: {
-          value: [],
-          detail: "",
-          options: [
-            {
-              value: 0,
-              lable: "10分钟"
-            },
-            {
-              value: 1,
-              lable: "20分钟"
-            },
-            {
-              value: 2,
-              lable: "30分钟"
-            },
-            {
-              value: 3,
-              lable: "40分钟"
-            }
-          ]
-        },
-        GPSstartTime: "",
-        GPSendTime: "",
-        powerLowStartTime: "",
-        powerLowEndtTime: "",
+        buzhang: "",
+        imie: "",
+        phone: "",
+        type: "",
+        equipmentType: "",
+        openTime: "",
+        gpsSwitch: "1",
+        whiteListSwitch: "1",
+        redKeyMessageSwitch: "1",
+        yellowKeyMessageSwitch: "1",
+        gpsCycle: "",
+        heartRateCycle: "",
+        bloodPressureCycle: "",
+        measurementCycle: "",
+        gpsSilenceStartTime: "",
+        gpsSilenceEndTime: "",
+        lowPowerReminderStartTime: "",
+        lowPowerReminderEndTime: "",
         balanceStartTime: "",
         balanceEndTime: "",
         measureStartTime: "",
@@ -225,211 +156,56 @@ export default {
         temperatureStartTime: "",
         temperatureEndTime: "",
         timeZone: "",
-        whiteList: [
+        whiteListList: [
           {
             name: "",
-            tel: ""
+            phone: ""
           }
         ],
         heartRateMax: "",
-        heartRateMaxValueType: {
-          value: "0",
-          options: [
-            {
-              lable: "默认值",
-              value: "0"
-            },
-            {
-              lable: "自定义",
-              value: "1"
-            }
-          ]
-        },
         heartRateMin: "",
-        heartRateMinValueType: {
-          value: "0",
-          options: [
+        bloodPressureHighMax: "",
+        bloodPressureHighMin: "",
+        bloodPressureLowMax: "",
+        bloodPressureLowMin: "",
+        redKeyPhone: "",
+        yellowKeyPhone: "",
+        greenKeyPhone: "",
+        reminderSettingsList: {
+          吃药提醒: [
             {
-              lable: "默认值",
-              value: "0"
-            },
+              code: "0",
+              name: "吃药提醒",
+              time: "",
+              repetMode: [],
+              open: true,
+              checkboxOptions: setDay
+            }
+          ],
+          喝水提醒: [
             {
-              lable: "自定义",
-              value: "1"
+              code: "1",
+              name: "喝水提醒",
+              time: "",
+              repetMode: [],
+              open: true,
+              checkboxOptions: setDay
+            }
+          ],
+          运动提醒: [
+            {
+              code: "2",
+              name: "运动提醒",
+              time: "",
+              repetMode: [],
+              open: true,
+              checkboxOptions: setDay
             }
           ]
         },
-        highPressureMax: "",
-        highPressureMaxValueType: {
-          value: "0",
-          options: [
-            {
-              lable: "默认值",
-              value: "0"
-            },
-            {
-              lable: "自定义",
-              value: "1"
-            }
-          ]
-        },
-        highPressureMix: "",
-        highPressureMixValueType: {
-          value: "0",
-          options: [
-            {
-              lable: "默认值",
-              value: "0"
-            },
-            {
-              lable: "自定义",
-              value: "1"
-            }
-          ]
-        },
-        lowPressureMax: "",
-        lowPressureMaxValueType: {
-          value: "0",
-          options: [
-            {
-              lable: "默认值",
-              value: "0"
-            },
-            {
-              lable: "自定义",
-              value: "1"
-            }
-          ]
-        },
-        lowPressureMax: "",
-        lowPressureMaxValueType: {
-          value: "0",
-          options: [
-            {
-              lable: "默认值",
-              value: "0"
-            },
-            {
-              lable: "自定义",
-              value: "1"
-            }
-          ]
-        },
-        telRedKey: "",
-        telYellowKey: "",
-        telGreenKey: "",
-        eatDrug: [
-          {
-            time: "",
-            repeatWay: [],
-            switch: true,
-            checkboxOptions: [
-              {
-                label: "周一",
-                value: "0"
-              },
-              {
-                label: "周二",
-                value: "1"
-              },
-              {
-                label: "周三",
-                value: "2"
-              },
-              {
-                label: "周四",
-                value: "3"
-              },
-              {
-                label: "周五",
-                value: "4"
-              },
-              {
-                label: "周六",
-                value: "5"
-              },
-              {
-                label: "周日",
-                value: "6"
-              }
-            ]
-          }
-        ],
-        drinkWater: [
-          {
-            time: "",
-            repeatWay: [],
-            switch: true,
-            checkboxOptions: [
-              {
-                label: "周一",
-                value: "0"
-              },
-              {
-                label: "周二",
-                value: "1"
-              },
-              {
-                label: "周三",
-                value: "2"
-              },
-              {
-                label: "周四",
-                value: "3"
-              },
-              {
-                label: "周五",
-                value: "4"
-              },
-              {
-                label: "周六",
-                value: "5"
-              },
-              {
-                label: "周日",
-                value: "6"
-              }
-            ]
-          }
-        ],
-        sport: [
-          {
-            time: "",
-            repeatWay: [],
-            switch: true,
-            checkboxOptions: [
-              {
-                label: "周一",
-                value: "0"
-              },
-              {
-                label: "周二",
-                value: "1"
-              },
-              {
-                label: "周三",
-                value: "2"
-              },
-              {
-                label: "周四",
-                value: "3"
-              },
-              {
-                label: "周五",
-                value: "4"
-              },
-              {
-                label: "周六",
-                value: "5"
-              },
-              {
-                label: "周日",
-                value: "6"
-              }
-            ]
-          }
-        ],
-        volume: 0
+        volume: 0,
+        // 电子围栏
+        fenceList: []
       },
       groupInfo: [
         {
@@ -452,21 +228,69 @@ export default {
             "号码设置",
             {
               title: "提醒设置",
-              subInfo: ["吃药提醒", "喝水提醒", "运动提醒"]
+              subInfo: ["吃药提醒", "喝水提醒", "运动提醒"],
+              addItemBtn: true,
+              slotKey: "remindSet"
             },
             "音量调整"
           ]
         }
       ],
-      tableData: [
-        {
-          name: "家",
-          apply: "你好"
-        }
-      ]
+      tableData: []
     };
   },
+  mounted() {
+    this.init();
+  },
   methods: {
+    init() {
+      const {deviceId, type} = this.$route.query;
+      // see 查看 edit 修改
+      this.disabled = (type == 'see'); 
+      if(deviceId) {
+        deviceSelectById({id: deviceId}).then(res => {
+          const data = res.data;
+          // this.model.type = data.type;
+          // this.model.equipmentType = data.equipmentType;
+          // this.model.gpsCycle = data.gpsCycle;
+          // this.model.heartRateCycle = data.heartRateCycle;
+          // this.model.bloodPressureCycle = data.bloodPressureCycle;
+          // this.model.measurementCycle = data.measurementCycle;
+          // this.model.timeZone = data.timeZone;
+          Object.assign(this.model, data)
+          let temp = {};
+          data.reminderSettingsList.forEach(item => {
+            item = {
+              ...item,
+              checkboxOptions: this.setDay
+            }
+            if(temp[item.name]) {
+              temp[item.name].push(item)
+            } else {
+              temp[item.name] = [item]
+              // 添加对应的插槽
+              this.groupInfo[2].info[7].subInfo.push(item.name);
+            }
+          })
+          this.model.reminderSettingsList = temp;
+        })
+      } else {
+        // 获取告警阈值设置默认值
+        exceptionValueList().then(res => {
+          const obj = {
+            1: ["heartRateMax", "heartRateMin"], // 心率报警
+            4: ["bloodPressureHighMax", "bloodPressureHighMin"], // 高压报警
+            5: ["bloodPressureLowMax", "bloodPressureLowMin"] // 低压报警
+          };
+          res.data.forEach(item => {
+            if (obj[item.type]) {
+              this.model[obj[item.type][0]] = item.limitValue;
+              this.model[obj[item.type][1]] = item.upperLower;
+            }
+          });
+        });
+      }
+    },
     addWhiteList() {
       this.model.whiteList.push({
         name: "",
@@ -474,14 +298,67 @@ export default {
       });
     },
     addAlarmClock(key) {
-      let template = JSON.parse(JSON.stringify(this.model[key][0]));
+      //  0：吃药提醒 1：喝水提醒 2：运动提醒 3：自定义
+      let template = JSON.parse(
+        JSON.stringify(this.model.reminderSettingsList[key][0])
+      );
       template.time = "";
-      template.repeatWay = [];
-      template.switch = true;
-      this.model[key].push(template);
+      template.repetMode = [];
+      template.open = true;
+      this.model.reminderSettingsList[key].push(template);
+    },
+    // 新增电子围栏
+    addEnclosure() {
+      this.$refs.addEnclosure.show()
     },
     selcectChange() {
       console.log(arguments);
+    },
+    submit() {
+      this.$refs.form.validate(valid => {
+        if (valid) {
+          let params = Object.assign(
+            {},
+            JSON.parse(JSON.stringify(this.model))
+          );
+          let temp = [];
+          Object.values(params.reminderSettingsList).forEach(val => {
+            temp.push(
+              ...val.map(item => {
+                return {
+                  time: item.time != '' && item.time != 'null' && item.time != 'undefind' ? item.time + ":00" : '',
+                  code: item.code,
+                  name: item.name,
+                  open: item.open,
+                  repetMode: item.repetMode
+                };
+              })
+            );
+          });
+          params.reminderSettingsList = temp;
+          Object.keys(params).forEach(item => {
+            if (typeof params[item] === "string" && params[item].length === 0)
+              delete params[item];
+            if (typeof params[item] === "number")
+              params[item] = String(params[item]);
+            // 所有时间相关的参数添加默认的秒00
+            if (
+              item.toLowerCase().indexOf("time") != -1 &&
+              params[item] &&
+              params[item] != "" &&
+              params[item] != "undefind" &&
+              params[item] != "null"
+            )
+              params[item] = params[item] + ":00";
+          });
+          deviceInsert(params).then(res => {
+            this.$message.success('操作成功');
+            this.$router.push('/sysControl/device')
+          });
+        } else {
+          this.$message.warning("表单内容有误，请检查");
+        }
+      });
     }
   }
 };

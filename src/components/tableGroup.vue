@@ -19,13 +19,12 @@
                   v-for="(item, itemIndex) in key.subInfo"
                   :key="`sub${itemIndex}`"
                 >
-                  <!-- <div> -->
                   <div class="rowTitle">{{ item }}</div>
                   <div class="rowContent">
                     <slot :name="item"></slot>
                   </div>
-                  <!-- </div> -->
                 </div>
+                <slot v-if="key.addItemBtn" :name="key.slotKey"></slot>
               </div>
             </template>
             <template v-else>
@@ -62,7 +61,7 @@ export default {
       default: () => {
         return {}
       }
-    }
+    },
   }
 };
 </script>
@@ -110,7 +109,7 @@ export default {
     }
   }
   :last-child {
-    margin-bottom: 0;
+    // margin-bottom: 0;
   }
   .rowBox {
     display: flex;

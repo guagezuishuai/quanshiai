@@ -34,7 +34,7 @@ export default {
   methods: {
     cardClick(path, index) {
       this.$router.push(path);
-      this.$store.commit('menuActiveChange', String(index))
+      // this.$store.commit('menuActiveChange', String(index))
     }
   }
 }
@@ -48,6 +48,7 @@ export default {
   flex-wrap: wrap;
   justify-content: flex-start;
   .card{
+    
     width: 33.33%;
     padding: 20px;
     box-sizing: border-box;
@@ -57,6 +58,11 @@ export default {
       align-items: center;
       padding: 15px;
       border-radius: 15px;
+      box-sizing: border-box;
+      border: 10px solid #caedfd4d;
+      &:hover{
+        border: 10px solid #fff;
+      }
       .leftImg{
         width: 90px;
         height: 105px;

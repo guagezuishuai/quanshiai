@@ -43,6 +43,7 @@
 </template>
 
 <script>
+import { login } from '@/api/login';
 import logo from '@/assets/imgs/login/LOGO@2x.png';
 import logoAndName from '@/assets/imgs/login/logo&name.png';
 export default {
@@ -65,7 +66,16 @@ export default {
             this.activeETab = tabNum;
         },
         login() {
-            this.$router.push('/monitorHome/index')
+            const params = {
+                name: this.account,
+                password: this.password
+            }
+            login(params).then(res => {
+                console.log(res)
+                localStorage.setItem('userInfo', JSON.stringify(res.data));
+                localStorage.setItem('token', res.data.token);
+                this.$router.push('/monitorHome/index');
+            })
         }
     }
 }

@@ -1,8 +1,8 @@
 /*
  * @Author: your name
  * @Date: 2020-05-05 11:33:24
- * @LastEditTime: 2020-06-04 22:26:44
- * @LastEditors: Please set LastEditors
+ * @LastEditTime: 2020-08-22 09:40:51
+ * @LastEditors: sueRimn
  * @Description: In User Settings Edit
  * @FilePath: /world-love/vue.config.js
  */ 
@@ -49,11 +49,29 @@ module.exports = {
       return options
     })
   },
-
   // devServer: {
-  //   overlay: {
-  //     warnings: true,
-  //     errors: true
-  //   }
-  // }
+  //   hot: true,
+  //   //  open: process.platform === 'darwin',
+  //   host: '0.0.0.0',
+  //   port: 8080,
+  //   https: false,
+  //   hotOnly: false,
+  //   before: () => {}
+  // },
+  devServer: {
+    host: "0.0.0.0",
+    port: 8080,
+    https: false,
+    hotOnly: false,
+    proxy: {
+      "/api": {
+        target: "http://39.101.220.101:8093/",
+        changeOrigin: true,
+        pathRewrite: {
+          "^/api": ""
+        }
+      },
+    }, // 设置代理
+    before: () => {}
+  },
 }

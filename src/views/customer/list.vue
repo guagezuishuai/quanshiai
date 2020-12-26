@@ -8,7 +8,7 @@
         <el-button class="mainbgcolor" size="small" type="primary" icon="el-icon-edit">批量导入</el-button>
       </div>
       <app-form ref="form" :dataInfo="dataInfo" :formType="formType" ></app-form>
-      <el-button @click="changeSearchBox" class="mainbgcolor" type="primary">{{ searchBoxState === 'up' ? '收起' : '更多查询条件' }}</el-button>
+      <!-- <el-button @click="changeSearchBox" class="mainbgcolor" type="primary">{{ searchBoxState === 'up' ? '收起' : '更多查询条件' }}</el-button> -->
     </div>
     
     <!-- 表格 -->
@@ -63,38 +63,28 @@
         </el-table-column>
         <el-table-column width="250px" label="操作">
           <template slot-scope="scope">
+            <div class="tableBtns">
+            <el-button class="btn_link btnSee" @click="toSee(scope)">查看</el-button>
+            <el-button class="btn_link btnEdit" @click="toEdit(scope)">修改</el-button>
+            <el-button class="btn_link btndel" @click="toDelet(scope)">删除</el-button>
+          </div>
+          <div class="tableBtns">
             <el-button
-              size="mini"
-              type="primary"
-              @click="toSee(scope.$index, scope.row)"
-              style="margin-bottom: 10px"
-            >查看</el-button>
-            <el-button
-              size="mini"
-              type="primary"
-              @click="toEdit(scope.$index, scope.row)"
-            >修改</el-button>
-            <el-button
-              size="mini"
-              type="danger"
-              @click="toDelet(scope.$index, scope.row)"
-            >删除</el-button>
-            <el-button
-              size="mini"
-              type="primary"
+              class="btn_link btnSee"
               @click="deviceControl(scope.$index, scope.row)"
               style="margin: 0"
             >设备</el-button>
             <el-button
-              size="mini"
-              type="primary"
-              @click="activation(scope.$index, scope.row)"
+              class="btn_link btnEdit"
+              :disabled="scope.row.status == '0'"
+              @click="activation(scope)"
             >激活</el-button>
             <el-button
-              size="mini"
-              type="danger"
-              @click="frozen(scope.$index, scope.row)"
+              class="btn_link btndel"
+              :disabled="scope.row.status == '1'"
+              @click="frozen(scope)"
             >冻结</el-button>
+          </div>
           </template>
         </el-table-column>
       </el-table>
@@ -117,6 +107,8 @@
 
 <script>
 import customTablemixins from '@/minxins/customTable';
+import {customerList} from '@/api/customer';
+import {BMIName} from '@/util/index';
 export default {
   mixins: [customTablemixins],
   data() {
@@ -130,7 +122,7 @@ export default {
         components: [
           {
             type: 'input',
-            props: 'userNumber',
+            props: 'customerNum',
             placeholder: '请输入客户编号',
             label: '客户编号',
             size: 'small',
@@ -141,7 +133,7 @@ export default {
           },
           {
             type: 'input',
-            props: 'userName',
+            props: 'customerName',
             placeholder: '请输入姓名',
             label: '姓名',
             size: 'small',
@@ -152,7 +144,7 @@ export default {
           },
           {
             type: 'input',
-            props: 'userIdCard',
+            props: 'customerCard',
             placeholder: '请输入身份证号',
             label: '身份证号',
             size: 'small',
@@ -161,17 +153,17 @@ export default {
               write: true
             }
           },
-          {
-            type: 'input',
-            props: 'bedNumber',
-            placeholder: '请输入床位编号',
-            label: '床位编号',
-            size: 'small',
-            auther: {
-              see: true,
-              write: true
-            }
-          },
+          // {
+          //   type: 'input',
+          //   props: 'bedNumber',
+          //   placeholder: '请输入床位编号',
+          //   label: '床位编号',
+          //   size: 'small',
+          //   auther: {
+          //     see: true,
+          //     write: true
+          //   }
+          // },
           {
             type: 'input',
             props: 'userAge',
@@ -185,7 +177,7 @@ export default {
           },
           {
             type: 'select',
-            props: 'userSex',
+            props: 'customerGender',
             placeholder: '请选择性别',
             label: '性别',
             size: 'small',
@@ -207,7 +199,7 @@ export default {
           },
           {
             type: 'input',
-            props: 'userTel',
+            props: 'customerPhpone',
             placeholder: '请输入电话号码',
             label: '电话号码',
             auther: {
@@ -217,7 +209,7 @@ export default {
           },
           {
             type: 'input',
-            props: 'userOrg',
+            props: 'organId',
             placeholder: '请输入所属机构',
             label: '所属机构',
             size: 'small',
@@ -226,39 +218,39 @@ export default {
               write: true
             }
           },
+          // {
+          //   type: 'select',
+          //   props: 'state',
+          //   placeholder: '请选择入住状态',
+          //   label: '入住状态',
+          //   contentWidth: '176px',
+          //   size: 'small',
+          //   options: [
+          //     {
+          //       label: '居家',
+          //       value: 0
+          //     },
+          //     {
+          //       label: '入住',
+          //       value: 1
+          //     },
+          //     {
+          //       label: '试住',
+          //       value: 2
+          //     },
+          //     {
+          //       label: '不确定',
+          //       value: 3
+          //     }
+          //   ],
+          //   auther: {
+          //     see: true,
+          //     write: true
+          //   }
+          // },
           {
             type: 'select',
-            props: 'state',
-            placeholder: '请选择入住状态',
-            label: '入住状态',
-            contentWidth: '176px',
-            size: 'small',
-            options: [
-              {
-                label: '居家',
-                value: 0
-              },
-              {
-                label: '入住',
-                value: 1
-              },
-              {
-                label: '试住',
-                value: 2
-              },
-              {
-                label: '不确定',
-                value: 3
-              }
-            ],
-            auther: {
-              see: true,
-              write: true
-            }
-          },
-          {
-            type: 'select',
-            props: 'assLevel',
+            props: 'abilityDegree',
             placeholder: '请选择能力等级',
             label: '能力等级',
             contentWidth: '176px',
@@ -288,8 +280,8 @@ export default {
           },
           {
             type: 'select',
-            props: 'nursingLevel',
-            placeholder: '请输选择护理级别',
+            props: 'nursingDegree',
+            placeholder: '请选择护理级别',
             label: '护理级别',
             contentWidth: '176px',
             size: 'small',
@@ -320,74 +312,74 @@ export default {
               write: true
             }
           },
-          {
-            type: 'select',
-            props: 'payState',
-            placeholder: '请选择缴费状态',
-            label: '缴费状态',
-            contentWidth: '176px',
-            size: 'small',
-            options: [
-              {
-                label: '已缴费',
-                value: 0
-              },
-              {
-                label: '欠费',
-                value: 1
-              },
-              {
-                label: '无需缴费',
-                value: 2
-              }
-            ],
-            auther: {
-              see: true,
-              write: true
-            }
-          },
-          {
-            type: 'select',
-            props: 'serviceState',
-            placeholder: '请选择服务状态',
-            label: '服务状态',
-            contentWidth: '176px',
-            size: 'small',
-            options: [
-              {
-                label: '服务中',
-                value: 0
-              },
-              {
-                label: '停止服务',
-                value: 1
-              },
-              {
-                label: '未服务',
-                value: 2
-              },
-              {
-                label: '不确定',
-                value: 3
-              }
-            ],
-            auther: {
-              see: true,
-              write: true
-            }
-          },
-          {
-            type: 'input',
-            props: 'otherInfo',
-            placeholder: '请输入其他信息',
-            label: '其他信息',
-            contentWidth: '176px',
-            size: 'small',
-            auther: {
-              see: true,
-              write: true
-            }
-          }
+          // {
+          //   type: 'select',
+          //   props: 'payState',
+          //   placeholder: '请选择缴费状态',
+          //   label: '缴费状态',
+          //   contentWidth: '176px',
+          //   size: 'small',
+          //   options: [
+          //     {
+          //       label: '已缴费',
+          //       value: 0
+          //     },
+          //     {
+          //       label: '欠费',
+          //       value: 1
+          //     },
+          //     {
+          //       label: '无需缴费',
+          //       value: 2
+          //     }
+          //   ],
+          //   auther: {
+          //     see: true,
+          //     write: true
+          //   }
+          // },
+          // {
+          //   type: 'select',
+          //   props: 'serviceState',
+          //   placeholder: '请选择服务状态',
+          //   label: '服务状态',
+          //   contentWidth: '176px',
+          //   size: 'small',
+          //   options: [
+          //     {
+          //       label: '服务中',
+          //       value: 0
+          //     },
+          //     {
+          //       label: '停止服务',
+          //       value: 1
+          //     },
+          //     {
+          //       label: '未服务',
+          //       value: 2
+          //     },
+          //     {
+          //       label: '不确定',
+          //       value: 3
+          //     }
+          //   ],
+          //   auther: {
+          //     see: true,
+          //     write: true
+          //   }
+          // },
+          // {
+          //   type: 'input',
+          //   props: 'otherInfo',
+          //   placeholder: '请输入其他信息',
+          //   label: '其他信息',
+          //   contentWidth: '176px',
+          //   size: 'small',
+          //   auther: {
+          //     see: true,
+          //     write: true
+          //   }
+          // }
         ],
       },
       // 表格的数据
@@ -420,7 +412,45 @@ export default {
       ]
     }
   },
+  mounted() {
+    this.init();
+  },
   methods: {
+    init() {
+      this.$refs.form.getFromValue(params => {
+        customerList(params).then(res => {
+          console.log(res)
+          this.tableData = res.data.records.map(item => {
+            return {
+              baseInfo: {
+                img: item.fileUrl,
+                number: item.customerNum,
+                name: item.customerName,
+                sex: item.customerGender,
+                age: item.age
+              },
+              idInfo: {
+                idNumber: item.customerCard,
+                tel: item.customerPhpone,
+                local: `${item.pname}-${item.cname}`,
+                org: item.customerOrg
+              },
+              healthInfo: {
+                assLevel: item.assessFinDegree,
+                BMI:  `${item.bmi}(${BMIName(item.bmi)})`,
+                diseaseInfo: item.disease
+              },
+              serviceInfo: {
+                registerTime: item.createdTime,
+                nursingLevel: item.nursingDegree,
+                // BedNumber: 'A4087'
+              }
+            }
+          });
+          this.count = res.total;
+        })
+      })
+    },
     changeSearchBox() {
       const isUp = this.searchBoxState === 'up';
       this.searchBoxState = isUp ? 'dowm' : 'up';

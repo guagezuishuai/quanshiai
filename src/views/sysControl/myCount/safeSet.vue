@@ -41,8 +41,13 @@ export default {
       },
     }
   },
-  computed: {
-    
+  mounted() {
+    this.init()
+  },
+  methods: {
+    init() {
+      
+    }
   }
 }
 </script>

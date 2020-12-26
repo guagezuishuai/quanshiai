@@ -16,7 +16,7 @@ $main-color: linear-gradient(to right, #2BB2E7 , #35D1CF);
 .tableBtns{
   display: flex;
   flex-wrap: wrap;
-  justify-content: space-around;
+  // justify-content: space-around;
   align-items: center;
   margin-bottom: 10px;
 }
@@ -32,10 +32,14 @@ $main-color: linear-gradient(to right, #2BB2E7 , #35D1CF);
   background-color: #F16D4F;
   color: #fff;
 }
-.btnSee:hover{
-  background-color: #2BB2E7;
-  color: #fff;
+// 表格分页的居中样式
+/deep/.el-pagination{
+  text-align: center;
+  margin: 10px 0;
 }
+// /deep/ .el-form-item__content, .el-date-editor{
+//   width: 192px;
+// }
 
 // tableGroup的公共样式
 .rowContent{

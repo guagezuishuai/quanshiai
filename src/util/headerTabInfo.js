@@ -49,6 +49,12 @@ export default [
         name: '健康档案',
         index: 4,
         path: '/healthyCtrol/archives'
+      },
+      {
+        name: '健康档案详情',
+        index: 5,
+        path: '/healthyCtrol/archivesDetail',
+        isShow: false
       }
     ]
   },

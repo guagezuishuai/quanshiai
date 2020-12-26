@@ -12,7 +12,7 @@
       </div>
       <app-form ref="form" :dataInfo="dataInfo">
         <el-form-item class="btn" slot="footer">
-          <el-button class="mainbgcolor" size="small" type="primary" icon="el-icon-edit">查询</el-button>
+          <el-button class="mainbgcolor" @click="search" size="small" type="primary" icon="el-icon-edit">查询</el-button>
         </el-form-item>
       </app-form>
     </div>
@@ -32,8 +32,8 @@
             <el-button class="btn_link btndel" @click="del(scope)">删除</el-button>
           </div>
           <div class="tableBtns">
-            <el-button class="btn_link btnSee" @click="activation(scope)">激活</el-button>
-            <el-button class="btn_link btndel" @click="thaw(scope)">冻结</el-button>
+            <el-button class="btn_link btnSee" :disabled="scope.row.status === '0'" @click="activation(scope)">激活</el-button>
+            <el-button class="btn_link btndel" :disabled="scope.row.status === '1'" @click="thaw(scope)">冻结</el-button>
           </div>
         </template>
       </el-table-column>
@@ -43,6 +43,7 @@
 
 <script>
 import customTablemixins from "@/minxins/customTable";
+import {listemp, updateStatus, employeeDelete} from '@/api/sys';
 export default {
   name: "staff",
   mixins: [customTablemixins],
@@ -55,7 +56,7 @@ export default {
         components: [
           {
             type: "input",
-            props: "userNumber",
+            prop: "orderNum",
             placeholder: "请输入员工编号",
             label: "员工编号",
             size: "small",
@@ -66,7 +67,7 @@ export default {
           },
           {
             type: "input",
-            props: "userNumber",
+            prop: "accountName",
             placeholder: "请输入登录账号",
             label: "登录账号",
             size: "small",
@@ -77,7 +78,7 @@ export default {
           },
           {
             type: "input",
-            props: "userNumber",
+            prop: "name",
             placeholder: "请输入姓名",
             label: "姓名",
             size: "small",
@@ -88,7 +89,7 @@ export default {
           },
           {
             type: "input",
-            props: "userNumber",
+            prop: "idCard",
             placeholder: "请输入身份证号",
             label: "身份证号",
             size: "small",
@@ -99,7 +100,7 @@ export default {
           },
           {
             type: "input",
-            props: "userNumber",
+            prop: "contactNumber",
             placeholder: "请输入联系电话",
             label: "联系电话",
             size: "small",
@@ -110,7 +111,7 @@ export default {
           },
           {
             type: "select",
-            props: "userSex",
+            prop: "roleType",
             placeholder: "请选择角色类型",
             label: "角色类型",
             size: "small",
@@ -132,7 +133,7 @@ export default {
           },
           {
             type: "input",
-            props: "userNumber",
+            prop: "organName",
             placeholder: "请输入所属机构",
             label: "所属机构",
             size: "small",
@@ -143,7 +144,7 @@ export default {
           },
           {
             type: "select",
-            props: "userSex",
+            prop: "level",
             placeholder: "请选择机构等级",
             label: "机构等级",
             size: "small",
@@ -165,53 +166,99 @@ export default {
           }
         ]
       },
-      tableData: [
-        {
-          orgName: "1"
-        }
-      ],
+      tableData: [],
       tableInfo: [
         {
           label: "员工编号",
-          prop: "orgName"
+          prop: "orderNum"
         },
         {
           label: "登录账号",
-          prop: "orgName"
+          prop: "accountName"
         },
         {
           label: "姓名",
-          prop: "orgName"
+          prop: "name"
         },
         {
           label: "身份证号",
-          prop: "orgName"
+          prop: "idCard"
         },
         {
           label: "联系电话",
-          prop: "orgName"
+          prop: "contactNumber"
         },
         {
           label: "角色类型",
-          prop: "orgName"
+          prop: "roleName"
         },
         {
           label: "所属机构",
-          prop: "orgName"
+          prop: "organName"
         },
         {
           label: "机构等级",
-          prop: "orgName"
+          prop: "level"
         },
         {
           label: "备注",
-          prop: "orgName"
+          prop: "employeeProfile"
         }
       ]
     };
   },
+  mounted() {
+    this.init();
+  },
   methods: {
-    
+    init() {
+      this.$refs.form.getFromValue(params => {
+        console.log(params)
+        params['page'] = {
+          size: this.pageSize,
+          current: this.page
+        }
+        listemp(params).then(res => {
+          this.tableData = res.data.records;
+        })
+      })
+    },
+    see(info) {
+      this.$router.push({
+        path: '/sysControl/staffAdd',
+        query: {
+          id: info.row.id,
+          isEdit: false
+        }
+      })
+    },
+    edit(info) {
+      this.$router.push({
+        path: '/sysControl/staffAdd',
+        query: {
+          id: info.row.id,
+          isEdit: true
+        }
+      })
+    },
+    del(info) {
+      employeeDelete({id: info.row.id}).then(res => {
+        this.$message.success('删除成功');
+        this.init();
+      })
+    },
+    activation(info) {
+      updateStatus({id: info.row.id, status: '0'}).then(res => {
+        this.$message.success('激活成功');
+        this.init();
+      })
+    },
+    thaw(info) {
+      updateStatus({id: info.row.id, status: '1'}).then(res => {
+        this.$message.success('冻结成功');
+        this.init();
+      })
+    }
   }
 };
 </script>
